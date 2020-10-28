@@ -1,0 +1,37 @@
+input{
+    file{
+        path => "C:\logstash-2.1.1\bin\titanic.csv"
+        start_position =>"beginning"
+        type => "stock"
+        sincedb_path => "NUL"
+        }
+}
+filter {
+    csv {
+        columns =>["PassengerId","Pclass","Name","Sex","Age","SibSp","Parch","Ticket","Fare","Cabin","Embarked"]
+        separator => ","
+    }
+
+
+    mutate {
+        convert => ["PassengerId","integer"]
+        convert => ["Pclass","integer"]
+        convert => ["Name","string"]
+        convert => ["Sex","string"]
+        convert => ["Age","double"]
+        convert => ["SibSp","integer"]
+        convert => ["Parch","integer"]
+		convert => ["Ticket","string"]
+		convert => ["Fare","double"]
+		convert => ["Cabin","string"]
+		convert => ["Embarked","string"]
+    }
+}
+
+output{
+     elasticsearch { 
+        index => ["logstash-titanic-%{+Sex}"]
+        hosts => ["localhost:9200"] 
+        }
+     stdout { codec => rubydebug }
+}
